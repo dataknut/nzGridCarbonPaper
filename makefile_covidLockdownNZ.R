@@ -2,7 +2,8 @@
 
 # Load some packages
 library(gridCarbon) # load this first - you will need to download & build it locally from this repo
-gridCarbon::setup()
+
+source("env.R")
 
 libs <- c("data.table", # data munching
           "drake", # data gets done once (ideally)
