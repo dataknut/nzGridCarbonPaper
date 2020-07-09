@@ -27,10 +27,11 @@ localParams$lockDownStart <- as.Date("2020-03-24")
 localParams$lockDownEnd <- lubridate::today()
 
 # > data paths ----
-gridDataPath <- paste0(gcParams$nzGridDataLoc, 
+gridDataPath <- paste0(repoParams$nzGridDataLoc, 
                                   "processed/yearly/")
-nonGridDataPath <- paste0(gcParams$nzNonGridDataLoc, 
+nonGridDataPath <- paste0(repoParams$nzNonGridDataLoc, 
                                      "processed/yearly/")
+
 # > captions ----
 localParams$gridCaption <- paste0("Source: NZ Energy Authority",
                                  "\nhttps://www.emi.ea.govt.nz/Wholesale/Datasets/Generation/Generation_MD/")
@@ -71,7 +72,7 @@ makeReport <- function(f){
                     params = list(title = title,
                                   subtitle = subtitle,
                                   authors = authors),
-                    output_file = paste0(gcParams$repoLoc,"/docs/nz/", title,"_",
+                    output_file = paste0(repoParams$repoLoc,"/docs/", title,"_",
                                          subtitle,".html")
   )
 }
@@ -188,7 +189,7 @@ authors <- "Ben Anderson, Carsten Dortans and Marilette Lotte"
 
 
 # >> run report ----
-rmdFile <- paste0(gcParams$repoLoc, "/rmd/nz/covidLockdown_NZ.Rmd")
+rmdFile <- paste0(repoParams$repoLoc, "/Rmd/covidLockdown_NZ.Rmd")
 
 makeReport(rmdFile)
 

@@ -40,7 +40,7 @@ startTime <- proc.time()
 # Local parameters ----
 b2Kb <- 1024 #http://whatsabyte.com/P1/byteconverter.htm
 b2Mb <- 1048576
-plotLoc <- paste0(gcParams$repoLoc, "/docs/plots/") # where to put the plots
+plotLoc <- here::here("docs","plots") # where to put the plots
 
 library(gridCarbon)
 # Packages used in the report ----
@@ -52,6 +52,8 @@ rmdLibs <- c("ggplot2", # plots
 gridCarbon::loadLibraries(rmdLibs)
 
 # Local parameters ----
+localParams$plotPath <- here::here("docs", "plots/")
+
 localParams$lockDownStartDate <- as.Date("2020-03-25")
 localParams$lockDownStartDateTime <- lubridate::as_datetime("2020-03-25 23:59:00")
 localParams$lockDownEndDate <- lubridate::today()
@@ -72,6 +74,7 @@ localParams$vLineCol <- "red" # http://www.cookbook-r.com/Graphs/Colors_(ggplot2
 localParams$myTextSize <- 4
 
 # Local functions ----
+# this is now in gridCarbon
 addLockdownDate <- function(p){
   # assumes p has x = obsDate
   p <- p + annotate("rect", xmin = localParams$lockDownStartDate,
@@ -160,7 +163,7 @@ addWeekendsDateTime <- function(p){
 
 ## Citation
 
-```{r citation, child=gcParams$citation}
+```{r citation, child=repoParams$citation}
 ```
 
 ## Report circulation
@@ -175,18 +178,16 @@ All code used to create this report is available from:
 
 ## License {#license}
 
-```{r ccby license, child=gcParams$licenseCCBY}
+```{r ccby license, child=repoParams$licenseCCBY}
 ```
 
 ## History
 
-```{r history, child=gcParams$history}
-```
- * this [report's edit history](https://github.com/CfSOtago/gridCarbon/commits/master/dataAnalysis/)
+ * See [report's edit history](https://github.com/CfSOtago/gridCarbon/commits/master/dataAnalysis/)
  
 ## Support
 
-```{r generic support, child=gcParams$support}
+```{r generic support, child=repoParams$support}
 ```
  * The European Union via [SPATIALEC](http://www.energy.soton.ac.uk/tag/spatialec/), a Marie Skłodowska-Curie [Global Fellowship](https://ec.europa.eu/research/mariecurieactions/actions/individual-fellowships_en) based at the University of Otago’s [Centre for Sustainability](http://www.otago.ac.nz/centre-sustainability/staff/otago673896.html) (2017-2019) & the University of Southampton’s [Sustainable Energy Research Group](http://www.otago.ac.nz/centre-sustainability/staff/otago673896.html) (2019-2020) (Anderson);
  * The Uniersity of Otago via a Centre for Sustainability Summer Scholarship (Lotte) and PhD Studentship (Dortans)
@@ -258,7 +259,7 @@ p <- ggplot2::ggplot(plotDT[obsDate > as.Date("2020-01-01")],
   theme(axis.text.x=element_text(angle=90, hjust=1)) +
   #scale_y_log10() +
   facet_grid(peakPeriod ~ .) +
-  geom_vline(xintercept = gcParams$NZLevel4StartDate) +
+  geom_vline(xintercept = repoParams$NZLevel4StartDate) +
   labs(x = dateLab,
          y = "Mean half hourly GWh (stacked) via",
        caption = paste0("Ref line = NZ Level 4 lockdown start",
@@ -269,11 +270,12 @@ p <- ggplot2::ggplot(plotDT[obsDate > as.Date("2020-01-01")],
 # yMax <- max(plotDT$meanGW)
 # yMin <- min(plotDT$meanGW)
 # p <- addLockdownRect(p, 
-#                 from = gcParams$UKlockDownStartDate, 
-#                 to = gcParams$UKlockDownEndDate, 
+#                 from = repoParams$UKlockDownStartDate, 
+#                 to = repoParams$UKlockDownEndDate, 
 #                 yMin = yMin, yMax = yMax)
 p
-ggplot2::ggsave(here::here("docs", "nz", "plots", "NZ_MWhFuelsTrendsStacked.png"), 
+ggplot2::ggsave(filename = "NZ_MWhFuelsTrendsStacked.png", 
+                path = localParams$plotPath, 
                 height = 10, width = 10, units = "in",
                 p)
 
@@ -289,7 +291,7 @@ p <- ggplot2::ggplot(plotDT[obsDate > as.Date("2020-01-01")],
   theme(axis.text.x=element_text(angle=90, hjust=1)) +
   #scale_y_log10() +
   facet_grid(peakPeriod ~ .) +
-  geom_vline(xintercept = gcParams$NZLevel4StartDate) +
+  geom_vline(xintercept = repoParams$NZLevel4StartDate) +
   labs(x = dateLab,
          y = "Mean half hourly GWh",
        caption = paste0("Ref line = NZ Level 4 lockdown start",
@@ -300,12 +302,13 @@ p <- ggplot2::ggplot(plotDT[obsDate > as.Date("2020-01-01")],
 # yMax <- max(plotDT$meanGW)
 # yMin <- min(plotDT$meanGW)
 # p <- addLockdownRect(p, 
-#                 from = gcParams$UKlockDownStartDate, 
-#                 to = gcParams$UKlockDownEndDate, 
+#                 from = repoParams$UKlockDownStartDate, 
+#                 to = repoParams$UKlockDownEndDate, 
 #                 yMin = yMin, yMax = yMax)
 p
 
-ggplot2::ggsave(here::here("docs", "nz", "plots", "NZ_MWhFuelsTrendsNonStacked.png"), 
+ggplot2::ggsave( filename = "NZ_MWhFuelsTrendsNonStacked.png", 
+                path = localParams$plotPath ,
                 height = 10, width = 10, units = "in",
                 p)
 ```
@@ -342,7 +345,7 @@ Not entirely sure what these codes mean yet. Limited [guidance](https://forum.em
 Demand profiles by season
 
 ```{r kWhBySeason2019}
-allGridDT <- gridCarbon::addNZSeason(allGridDT, date = "rDate")
+allGridDT <- gridCarbon::addSeason(allGridDT, h = "S", dateVar =  "rDate")
 MWhDT <- allGridDT[, .(MWh = sum(kWh/1000)), keyby = .(rDateTimeNZT, rTime, season, year)]
 
 plotDT <- MWhDT[year == 2019, .(meanMWh = mean(MWh)), keyby = .(rTime, season)]
@@ -357,7 +360,7 @@ p <- ggplot2::ggplot(plotDT, aes(x = rTime, y = meanMWh/1000, colour = season)) 
 
 ggplot2::ggsave(filename = "NZ_GWhBySeason_2019.png",
                 plot = p,
-                path = here::here("docs", "nz","plots"))
+                path = localParams$plotPath)
 p
 ```
 
@@ -372,7 +375,7 @@ oaMWh <- openair::TheilSen(MWhDT, "MWh",
                   date.breaks = 4,
                   type = c("peakPeriod"), layout = c(5,1))
 p <- oaMWh$plot
-png(filename=here::here("docs/nz/plots/openAir_NZ_TheilSenMWhPlot.png"), 
+png(filename=here::here("docs","plots","openAir_NZ_TheilSenMWhPlot.png"), 
     width = 960, units = "px")
 # dpi = 600, width = 13.333, height = 7.5, units = "in"
 plot(p)
@@ -557,8 +560,8 @@ myPlotTot <- ggplot2::ggplot(plotDT, aes(x= rDateTimeNZT )) +
   #facet_grid(rMonth ~ .)
 myPlotTot
 
-of <- paste0(here::here("docs","nz", "plots", "NZ_TotalElectricityGeneration.jpeg"))
-ggplot2::ggsave(of, myPlotTot, 
+ggplot2::ggsave(filename = "NZ_TotalElectricityGeneration.jpeg", 
+                myPlotTot, path = localParams$plotPath,
                 dpi = 600, width = 13.333, height = 7.5, units = "in")
 ```
 
@@ -949,6 +952,7 @@ myPlotTot
 ```
 
 ```{r weekdaymean}
+# currently breaks?
 
 #This code calculates the mean for weekdays/non-weekdays for pre-lockdown and lockdown time
 
@@ -965,7 +969,7 @@ plotDT <- recastDT[date >= "2020-01-08"&
                    date >= "2020-04-01"&
                    date <= "2020-04-21"]
 
-plotDT <- plotDT[, time := hms::as.hms(rDateTimeNZT)]
+plotDT <- plotDT[, time := hms::as_hms(rDateTimeNZT)]
 
 #Calcuclating mean
 
@@ -1344,247 +1348,6 @@ skimr::skim(allEmbeddedDT)
 ```
 
 ## Conversion factors
-
-## Heat pump imact simple simulation
-
-Create an animation of a simulation of flattening peak. 
-
-We use GREEN Grid heat pump data to calculate the mean kW per half hour.
-```{r loadHeatPump}
-hpDT <- data.table::fread("/mnt/SERG_data/NZ_GREENGrid/safe/1min/dataExtracts/Heat_Pump_2015-04-01_2016-03-31_observations.csv.gz")
-hpDT[, r_dateTimeLubridated := lubridate::as_datetime(r_dateTime)]
-hpDT[, rDateTimeNZT := lubridate::with_tz(r_dateTimeLubridated, tzone = "Pacific/Auckland")]
-
-hpDT[, obsDate := as.Date(rDateTimeNZT)]
-hpDT <- addSeason(hpDT, h = "S", date = "obsDate")
-hpDT[, year := lubridate::year(rDateTimeNZT)]
-hpDT[, hms:= hms::as_hms(rDateTimeNZT)]
-hpDT[, halfHour:= hms::trunc_hms(hms, 30*60)]
-
-h <- head(hpDT[,.(r_dateTime, r_dateTimeLubridated, rDateTimeNZT, halfHour)])
-h
-
-#uniqueN(hpDT$halfHour)
-hpDT[, .(minTime = min(hms),
-         maxTime = max(hms)),
-     keyby = .(halfHour)]
-
-
-baselineDT <- hpDT[, .(meankW = mean(powerW/1000)), keyby = .(year, season, halfHour)]
-
-
-# check plot
-ggplot2::ggplot(baselineDT[year == 2015], aes(x = halfHour, y = meankW, colour = season)) +
-  geom_line() +
-  facet_grid(year ~ .) +
-  labs(x = "Time",
-       y = "Mean kW",
-       caption = "Data: NZ GREEN Grid households")
-```
-
-which suggests ~0.6 kW power in the morning peak and 0.5 in the evening. Perhaps people light woodburners in the evening?
-
-BRANZ HCS 2015:
- * 40% owner-occupiers have HPs
- * 25% rentals
-
-NZ Census:
- * 64% X m owner-occupied -> 1,228,500
- * 32% Y m rentals -> 609,700
- * 4% (?) rent-free -> 65,200 (we treat these as owned)
-
-https://www.stats.govt.nz/information-releases/dwelling-and-household-estimates-september-2019-quarter
-
-
-First we inflate it by adding 1 kW heat pump per house - which we assume needs 0.5 kWh per half hour. For 2 million households. That +1 GWh :-)
-
-```{r kWhWinterSimulation}
-nOwner <- 1228500 + 65200 # owned + rent free
-nRenter <- 609700 # rented
-hpsOwner <- 0.4 * nOwner
-hpsRenter <- 0.25 * nRenter
-
-
-
-baselineDT[, hpCurrentMeanMW := ((meankW * hpsOwner) + (meankW * hpsRenter))/1000]
-baselineDT[, hpCurrentMeanMWh := hpCurrentMeanMW/2]
-
-# model to 100%
-newHPsOwner <- nOwner * (1-0.4) # 40% already have them
-newHPsRenter <- nRenter * (1-0.25) # 40% already have them
-
-baselineDT[, hpFutureMeanMW := ((meankW * nOwner) + (meankW * nRenter))/1000]
-baselineDT[, hpFutureMeanMWh := hpFutureMeanMW/2]
-
-p <- ggplot2::ggplot(baselineDT[year == 2015], aes(x = halfHour, y = hpCurrentMeanMWh, colour = season)) +
-  geom_step() +
-  theme(legend.position="bottom") +
-  scale_color_discrete(name="Season") +
-  labs(x = "Time",
-       y = "Mean MWh (heat pumps)",
-       caption = "Year: 2019\nData source: NZ GREEN Grid")
-
-p
-```
-
-```{r buildHPModel}
-MWhDT[, halfHour := hms::trunc_hms(hms, 30*60)]
-gridDT <- MWhDT[, .(meanMWh = mean(MWh)), keyby = .(halfHour, season, year)]
-
-ggplot2::ggplot(gridDT[year == 2017], aes(x = halfHour, y = meanMWh, colour = season)) +
-  geom_line() +
-  facet_grid(year ~ .) +
-  labs(x = "Time",
-       y = "MWh (total)",
-       caption = "Data: NZ Electricity Authority")
-
-# just take winter
-winter2017DT <- gridDT[year == 2017 & season == "Winter"]
-winter2017DT[, model := "2017 generation"]
-setkey(winter2017DT, halfHour, season, year)
-
-winterHpCurrentDT <- baselineDT[year == 2015 & season == "Winter", .(year, meanMWh = hpCurrentMeanMWh, 
-                                                                     halfHour, season)]
-winterHpCurrentDT[, year := 2017] # fix
-winterHpCurrentDT[, model := "Modelled Heat pump (2017)"]
-
-winterHpFutureDT <- baselineDT[year == 2015 & season == "Winter", .(year, hpFutureMeanMWh, 
-                                                                     halfHour, season)]
-winterHpFutureDT[, year := 2017] # fix
-setkey(winterHpFutureDT, halfHour, season, year)
-winterHpFutureDT <- winterHpFutureDT[winter2017DT]
-winterHpFutureDT[, meanMWh := hpFutureMeanMWh + meanMWh]
-winterHpFutureDT[, model := "100% heat pump"]
-
-modelDT <- rbind(winter2017DT[, .(year, halfHour, season, meanMWh, model)],
-                 winterHpCurrentDT[, .(year, halfHour, season, meanMWh, model)],
-                 winterHpFutureDT[, .(year, halfHour, season, meanMWh, model)])
-                 
-ggplot2::ggplot(modelDT[year == 2017], aes(x = halfHour, y = meanMWh/1000, colour = model)) +
-  geom_line() +
-  facet_grid(year ~ season) +
-  scale_color_discrete(name="Model") +
-  labs(x = "Time",
-       y = "GWh (total)",
-       caption = "Data: NZ Electricity Authority, NZ GREEN Grid households, \nNZ Census 2018, BRANZ HCS 2015")
-
-```
-
-
-```{r flattenTheCurve}
-
-leveled20pcDT <- gridDT[year == 2017 & season == "Winter"]
-overallMeanMWh <- mean(leveled20pcDT$meanMWh)
-leveled20pcDT[, diff := meanMWh - overallMeanMWh]
-leveled20pcDT[, levelled := (0.2 * -1 * diff) + meanMWh]
-leveled20pcDT[, meanMWh := levelled]
-leveled20pcDT[, model := "20% flatten"]
-
-leveled40pcDT <- gridDT[year == 2017 & season == "Winter"]
-leveled40pcDT[, diff := meanMWh - overallMeanMWh]
-leveled40pcDT[, meanMWh := (0.4 * -1 * diff) + meanMWh]
-leveled40pcDT[, model := "40% flatten"]
-
-leveled60pcDT <- gridDT[year == 2017 & season == "Winter"]
-leveled60pcDT[, diff := meanMWh - overallMeanMWh]
-leveled60pcDT[, meanMWh := (0.6 * -1 * diff) + meanMWh]
-leveled60pcDT[, model := "60% flatten"]
-
-leveled80pcDT <- gridDT[year == 2017 & season == "Winter"]
-leveled80pcDT[, diff := meanMWh - overallMeanMWh]
-leveled80pcDT[, meanMWh := (0.8 * -1 * diff) + meanMWh]
-leveled80pcDT[, model := "80% flatten"]
-
-# p <- ggplot(leveledDT, aes(x = halfHour)) + 
-#   geom_line(aes(y = levelled), colour = "red") +
-#   geom_line(aes(y = diff), colour = "blue") +
-#   geom_line(aes(y = meanMWh))
-
-modelDT <- rbind(winter2017DT[, .(year, halfHour, season, meanMWh, model)],
-                 winterHpCurrentDT[, .(year, halfHour, season, meanMWh, model)],
-                 winterHpFutureDT[, .(year, halfHour, season, meanMWh, model)], 
-                 leveled20pcDT[, .(year, halfHour, season, meanMWh, model)], 
-                 leveled40pcDT[, .(year, halfHour, season, meanMWh, model)], 
-                 leveled60pcDT[, .(year, halfHour, season, meanMWh, model)], 
-                 leveled80pcDT[, .(year, halfHour, season, meanMWh, model)])
-
-modelDT[, model := factor(model, levels = c("2017 generation",
-                                              "100% heat pump",
-                                              "20% flatten", 
-                                              "40% flatten", 
-                                              "60% flatten", 
-                                              "80% flatten")
-                           )
-        ]
-```
-
-```{r flattenTheCurvePlots}
-yMax <- max(modelDT$meanMWh/1000) # GWh
-myCap <- "Data: NZ Electricity Authority, NZ GREEN Grid households, \nNZ Census 2018, BRANZ HCS 2015"
-
-drawPlot <- function(dt){
-  p <- ggplot2::ggplot(dt, 
-                  aes(x = halfHour, y = meanMWh/1000,  colour = model)) +
-  geom_line() +
-  scale_color_discrete(name="Ambition") +
-  # theme(legend.position="bottom")
-  ylim(1.5,yMax) +
-  labs(x = "Time",
-       y = "Demand")
-  p <- p + theme_dark() +
-    theme(plot.background = element_rect(fill = "black"),
-          legend.background = element_rect(fill = "darkGrey"))
-  return(p)
-}
-
-plotDT <- modelDT[year == 2017 & !(model %like% "Modelled") & 
-                               !is.na(model)]
-dt <- plotDT[model %like% "gen"]
-p1 <- drawPlot(dt)
-p1
-ggplot2::ggsave(filename = "flattenTheCurve_1.png", 
-                     path = here::here("docs", "nz", "plots"))
-
-p2 <- drawPlot(plotDT[model %like% "gen" | 
-                               model %like% "100%"])
-p2
-ggplot2::ggsave(filename = "flattenTheCurve_2.png", 
-                     path = here::here("docs", "nz", "plots"))
-
-p3 <- drawPlot(plotDT[model %like% "gen" | 
-                               model %like% "100%" | 
-                               model %like% "20%"])
-p3
-ggplot2::ggsave(filename = "flattenTheCurve_3.png", 
-                     path = here::here("docs", "nz", "plots"))
-
-p4 <- drawPlot(plotDT[model %like% "gen" | 
-                               model %like% "100%" | 
-                               model %like% "20%" | 
-                               model %like% "40%"])
-p4
-ggplot2::ggsave(filename = "flattenTheCurve_4.png", 
-                     path = here::here("docs", "nz", "plots"))
-
-p5 <- drawPlot(plotDT[model %like% "gen" | 
-                               model %like% "100%" | 
-                               model %like% "20%" | 
-                               model %like% "40%" | 
-                               model %like% "60%" ])
-p5
-ggplot2::ggsave(filename = "flattenTheCurve_5.png", 
-                     path = here::here("docs", "nz", "plots"))
-
-p6 <- drawPlot(plotDT[model %like% "gen" | 
-                               model %like% "100%" | 
-                               model %like% "20%" | 
-                               model %like% "40%" | 
-                               model %like% "60%" | 
-                               model %like% "80%"])
-p6
-ggplot2::ggsave(filename = "flattenTheCurve_6.png", 
-                     path = here::here("docs", "nz", "plots"))
-```
 
 
 # Runtime

@@ -22,6 +22,7 @@ repoParams$user <- repoParams$info[[7]]
 repoParams$nzData <- "No idea, you need to edit env.R so I can find it!"
 
 # > Set data path ----
+## >> Otago CS RStudio server ----
 if((repoParams$user == "dataknut" | repoParams$user == "carsten" ) & 
    repoParams$sysname == "Linux"){ # Otago CS RStudio server
   
@@ -36,8 +37,8 @@ if((repoParams$user == "dataknut" | repoParams$user == "carsten" ) &
   repoParams$nzData <- repoParams$GreenGridData
   repoParams$ukData <- path.expand("not set")
 }
+## >> Ben's laptop ----
 if(repoParams$user == "ben" & repoParams$sysname == "Darwin"){
-  # Ben's laptop
   repoParams$GreenGrid <- path.expand("~/Data/NZ_GREENGrid/")
   repoParams$GreenGridData <- path.expand("~/Data/NZ_GREENGrid/safe/")
   repoParams$censusData <- path.expand("~/Data/NZ_Census/") # fix for your platform
@@ -46,8 +47,8 @@ if(repoParams$user == "ben" & repoParams$sysname == "Darwin"){
   repoParams$nzNonGridDataLoc <- path.expand("~/Data/NZ_EA_EMI/EA_Embedded_Generation_Data/")
   repoParams$nzData <- paste0(repoParams$GreenGrid, "externalData/")
 }
+## >> Carsten's laptop ----
 if(repoParams$user == "carsten.dortans" & repoParams$sysname == "Darwin"){
-  # Carsten's laptop
   repoParams$GreenGridData <- path.expand("/Volumes/hum-csafe/Research Projects/GREEN Grid/cleanData/safe/")
   repoParams$nzGridDataLoc <- path.expand(paste0(repoParams$GreenGridData, 
                                                "/EA_Generation_Data/"))
@@ -55,8 +56,8 @@ if(repoParams$user == "carsten.dortans" & repoParams$sysname == "Darwin"){
                                                   "/EA_Embedded_Generation_Data/"))
   repoParams$nzData <- repoParams$GreenGridData
 }
+## >> UoS RStudio server ----
 if(repoParams$user == "ba1e12" & repoParams$sysname == "Linux" & repoParams$nodename == "srv02405"){
-  # UoS RStudio server
   repoParams$ukGridDataLoc <- path.expand(paste0(repoParams$ukData, "/EA_Generation_Data/"))
   repoParams$ukNonGridDataLoc <- path.expand(paste0(repoParams$ukData, "EA_Embedded_Generation_Data/"))
   repoParams$nzData <- path.expand("/mnt/SERG_data/NZ_EA_EMI")
@@ -93,6 +94,14 @@ repoParams$myTextSize <- 4
 repoParams$weAlpha <- 0.3 # weekend shaded rects on plots
 repoParams$weFill <- "grey50"
 repoParams$labelPos <- 0.9
+
+# include paths ----
+repoParams$licenseCCBY <- here::here("includes", "licenseCCBY.Rmd")
+repoParams$circulationGeneric <- here::here("includes", "circulationGeneric.Rmd")
+repoParams$citationGeneric <- here::here("includes", "citationGeneric.Rmd")
+repoParams$citationUoS <- here::here("includes", "citationUoS.Rmd")
+repoParams$historyGeneric <- here::here("includes", "historyGeneric.Rmd")
+repoParams$supportGeneric <- here::here("includes", "supportGeneric.Rmd")
 
 
 message("We're ", repoParams$user, " using " , repoParams$sysname, " on ", repoParams$nodename)
