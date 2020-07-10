@@ -55,6 +55,15 @@ gridCarbon::loadLibraries(rmdLibs)
 localParams$plotPath <- here::here("docs", "plots/")
 ```
 
+# Get national demand data
+
+```{r gridGen}
+
+allGridDT <- drake::readd(gridGenData)
+
+MWhDT <- allGridDT[, .(MWh = sum(kWh/1000)), keyby = .(rDateTimeNZT, rTime, season, year)]
+```
+
 # Heat pump impact simple simulation
 
 Create an animation of a simulation of flattening peak. 
@@ -62,16 +71,8 @@ Create an animation of a simulation of flattening peak.
 We use GREEN Grid heat pump data to calculate the mean kW per half hour.
 
 ```{r loadHeatPump}
-f <- paste0(repoParams$GreenGridData, "1min/dataExtracts/Heat Pump_2015-04-01_2016-03-31_observations.csv.gz")
-hpDT <- data.table::fread(f)
-hpDT[, r_dateTimeLubridated := lubridate::as_datetime(r_dateTime)]
-hpDT[, rDateTimeNZT := lubridate::with_tz(r_dateTimeLubridated, tzone = "Pacific/Auckland")]
 
-hpDT[, obsDate := as.Date(rDateTimeNZT)]
-hpDT <- gridCarbon::addSeason(hpDT, h = "S", dateVar = "obsDate")
-hpDT[, year := lubridate::year(rDateTimeNZT)]
-hpDT[, hms:= hms::as_hms(rDateTimeNZT)]
-hpDT[, halfHour:= hms::trunc_hms(hms, 30*60)]
+hpDT <- drake::readd(heatPumpData)
 
 h <- head(hpDT[,.(r_dateTime, r_dateTimeLubridated, rDateTimeNZT, halfHour)])
 h
@@ -140,7 +141,7 @@ p
 ```
 
 ```{r buildHPModel}
-MWhDT[, halfHour := hms::trunc_hms(hms, 30*60)]
+MWhDT[, halfHour := hms::trunc_hms(rTime, 30*60)]
 gridDT <- MWhDT[, .(meanMWh = mean(MWh)), keyby = .(halfHour, season, year)]
 
 ggplot2::ggplot(gridDT[year == 2017], aes(x = halfHour, y = meanMWh, colour = season)) +

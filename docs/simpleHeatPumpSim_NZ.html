@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Ben Anderson" />
+
+
+<title>Simple NZ Heat Pump Adoption Simulation</title>
+
+<script src="simpleHeatPumpSim_NZ_files/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="simpleHeatPumpSim_NZ_files/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="simpleHeatPumpSim_NZ_files/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="simpleHeatPumpSim_NZ_files/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="simpleHeatPumpSim_NZ_files/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="simpleHeatPumpSim_NZ_files/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="simpleHeatPumpSim_NZ_files/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="simpleHeatPumpSim_NZ_files/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="simpleHeatPumpSim_NZ_files/navigation-1.1/tabsets.js"></script>
+<script src="simpleHeatPumpSim_NZ_files/navigation-1.1/codefolding.js"></script>
+<link href="simpleHeatPumpSim_NZ_files/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="simpleHeatPumpSim_NZ_files/highlightjs-9.12.0/highlight.js"></script>
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="fluid-row" id="header">
+
+<div class="btn-group pull-right">
+<button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
+</div>
+
+
+
+<h1 class="title toc-ignore">Simple NZ Heat Pump Adoption Simulation</h1>
+<h3 class="subtitle">Very simple… v1.0</h3>
+<h4 class="author">Ben Anderson</h4>
+<h4 class="date">Last run at: 2020-07-10 15:42:44</h4>
+
+</div>
+
+
+<div id="get-national-demand-data" class="section level1">
+<h1><span class="header-section-number">1</span> Get national demand data</h1>
+</div>
+<div id="heat-pump-impact-simple-simulation" class="section level1">
+<h1><span class="header-section-number">2</span> Heat pump impact simple simulation</h1>
+<p>Create an animation of a simulation of flattening peak.</p>
+<p>We use GREEN Grid heat pump data to calculate the mean kW per half hour.</p>
+<pre><code>##              r_dateTime r_dateTimeLubridated        rDateTimeNZT halfHour
+## 1: 2015-04-01T00:00:00Z  2015-04-01 00:00:00 2015-04-01 13:00:00 13:00:00
+## 2: 2015-04-01T00:01:00Z  2015-04-01 00:01:00 2015-04-01 13:01:00 13:00:00
+## 3: 2015-04-01T00:02:00Z  2015-04-01 00:02:00 2015-04-01 13:02:00 13:00:00
+## 4: 2015-04-01T00:03:00Z  2015-04-01 00:03:00 2015-04-01 13:03:00 13:00:00
+## 5: 2015-04-01T00:04:00Z  2015-04-01 00:04:00 2015-04-01 13:04:00 13:00:00
+## 6: 2015-04-01T00:05:00Z  2015-04-01 00:05:00 2015-04-01 13:05:00 13:00:00</code></pre>
+<pre><code>##     halfHour  minTime  maxTime
+##  1: 00:00:00 00:00:00 00:29:00
+##  2: 00:30:00 00:30:00 00:59:00
+##  3: 01:00:00 01:00:00 01:29:00
+##  4: 01:30:00 01:30:00 01:59:00
+##  5: 02:00:00 02:00:00 02:29:00
+##  6: 02:30:00 02:30:00 02:59:00
+##  7: 03:00:00 03:00:00 03:29:00
+##  8: 03:30:00 03:30:00 03:59:00
+##  9: 04:00:00 04:00:00 04:29:00
+## 10: 04:30:00 04:30:00 04:59:00
+## 11: 05:00:00 05:00:00 05:29:00
+## 12: 05:30:00 05:30:00 05:59:00
+## 13: 06:00:00 06:00:00 06:29:00
+## 14: 06:30:00 06:30:00 06:59:00
+## 15: 07:00:00 07:00:00 07:29:00
+## 16: 07:30:00 07:30:00 07:59:00
+## 17: 08:00:00 08:00:00 08:29:00
+## 18: 08:30:00 08:30:00 08:59:00
+## 19: 09:00:00 09:00:00 09:29:00
+## 20: 09:30:00 09:30:00 09:59:00
+## 21: 10:00:00 10:00:00 10:29:00
+## 22: 10:30:00 10:30:00 10:59:00
+## 23: 11:00:00 11:00:00 11:29:00
+## 24: 11:30:00 11:30:00 11:59:00
+## 25: 12:00:00 12:00:00 12:29:00
+## 26: 12:30:00 12:30:00 12:59:00
+## 27: 13:00:00 13:00:00 13:29:00
+## 28: 13:30:00 13:30:00 13:59:00
+## 29: 14:00:00 14:00:00 14:29:00
+## 30: 14:30:00 14:30:00 14:59:00
+## 31: 15:00:00 15:00:00 15:29:00
+## 32: 15:30:00 15:30:00 15:59:00
+## 33: 16:00:00 16:00:00 16:29:00
+## 34: 16:30:00 16:30:00 16:59:00
+## 35: 17:00:00 17:00:00 17:29:00
+## 36: 17:30:00 17:30:00 17:59:00
+## 37: 18:00:00 18:00:00 18:29:00
+## 38: 18:30:00 18:30:00 18:59:00
+## 39: 19:00:00 19:00:00 19:29:00
+## 40: 19:30:00 19:30:00 19:59:00
+## 41: 20:00:00 20:00:00 20:29:00
+## 42: 20:30:00 20:30:00 20:59:00
+## 43: 21:00:00 21:00:00 21:29:00
+## 44: 21:30:00 21:30:00 21:59:00
+## 45: 22:00:00 22:00:00 22:29:00
+## 46: 22:30:00 22:30:00 22:59:00
+## 47: 23:00:00 23:00:00 23:29:00
+## 48: 23:30:00 23:30:00 23:59:00
+##     halfHour  minTime  maxTime</code></pre>
+<p><img src="simpleHeatPumpSim_NZ_files/figure-html/loadHeatPump-1.png" width="672" /></p>
+<p>which suggests ~0.6 kW power in the morning peak and 0.5 in the evening. Perhaps people light woodburners in the evening?</p>
+<p>BRANZ HCS 2015:
+* 40% owner-occupiers have HPs
+* 25% rentals</p>
+<p>NZ Census:
+* 64% X m owner-occupied -&gt; 1,228,500
+* 32% Y m rentals -&gt; 609,700
+* 4% (?) rent-free -&gt; 65,200 (we treat these as owned)</p>
+<p><a href="https://www.stats.govt.nz/information-releases/dwelling-and-household-estimates-september-2019-quarter" class="uri">https://www.stats.govt.nz/information-releases/dwelling-and-household-estimates-september-2019-quarter</a></p>
+<p>First we inflate it by adding 1 kW heat pump per house - which we assume needs 0.5 kWh per half hour. For 2 million households. That +1 GWh :-)</p>
+<p><img src="simpleHeatPumpSim_NZ_files/figure-html/kWhWinterSimulation-1.png" width="672" /></p>
+<p><img src="simpleHeatPumpSim_NZ_files/figure-html/buildHPModel-1.png" width="672" /><img src="simpleHeatPumpSim_NZ_files/figure-html/buildHPModel-2.png" width="672" /></p>
+</div>
+<div id="flatten-the-curve-plots" class="section level1">
+<h1><span class="header-section-number">3</span> Flatten the curve plots</h1>
+<p>Another simulation</p>
+<p><img src="simpleHeatPumpSim_NZ_files/figure-html/flattenTheCurvePlots-1.png" width="672" /></p>
+<pre><code>## Saving 7 x 5 in image</code></pre>
+<p><img src="simpleHeatPumpSim_NZ_files/figure-html/flattenTheCurvePlots-2.png" width="672" /></p>
+<pre><code>## Saving 7 x 5 in image</code></pre>
+<p><img src="simpleHeatPumpSim_NZ_files/figure-html/flattenTheCurvePlots-3.png" width="672" /></p>
+<pre><code>## Saving 7 x 5 in image</code></pre>
+<p><img src="simpleHeatPumpSim_NZ_files/figure-html/flattenTheCurvePlots-4.png" width="672" /></p>
+<pre><code>## Saving 7 x 5 in image</code></pre>
+<p><img src="simpleHeatPumpSim_NZ_files/figure-html/flattenTheCurvePlots-5.png" width="672" /></p>
+<pre><code>## Saving 7 x 5 in image</code></pre>
+<p><img src="simpleHeatPumpSim_NZ_files/figure-html/flattenTheCurvePlots-6.png" width="672" /></p>
+<pre><code>## Saving 7 x 5 in image</code></pre>
+</div>
+<div id="runtime" class="section level1">
+<h1><span class="header-section-number">4</span> Runtime</h1>
+<p>Analysis completed in 48.39 seconds ( 0.81 minutes) using <a href="https://cran.r-project.org/package=knitr">knitr</a> in <a href="http://www.rstudio.com">RStudio</a> with R version 3.6.3 (2020-02-29) running on x86_64-apple-darwin15.6.0.</p>
+</div>
+<div id="r-environment" class="section level1">
+<h1><span class="header-section-number">5</span> R environment</h1>
+<div id="r-packages-used" class="section level2">
+<h2><span class="header-section-number">5.1</span> R packages used</h2>
+<ul>
+<li>base R <span class="citation">(R Core Team 2016)</span></li>
+<li>bookdown <span class="citation">(Xie 2016a)</span></li>
+<li>data.table <span class="citation">(Dowle et al. 2015)</span></li>
+<li>ggplot2 <span class="citation">(Wickham 2009)</span></li>
+<li>kableExtra <span class="citation">(Zhu 2018)</span></li>
+<li>knitr <span class="citation">(Xie 2016b)</span></li>
+<li>lubridate <span class="citation">(Grolemund and Wickham 2011)</span></li>
+<li>rmarkdown <span class="citation">(Allaire et al. 2018)</span></li>
+</ul>
+</div>
+<div id="session-info" class="section level2">
+<h2><span class="header-section-number">5.2</span> Session info</h2>
+<pre><code>## R version 3.6.3 (2020-02-29)
+## Platform: x86_64-apple-darwin15.6.0 (64-bit)
+## Running under: macOS Catalina 10.15.5
+## 
+## Matrix products: default
+## BLAS:   /System/Library/Frameworks/Accelerate.framework/Versions/A/Frameworks/vecLib.framework/Versions/A/libBLAS.dylib
+## LAPACK: /Library/Frameworks/R.framework/Versions/3.6/Resources/lib/libRlapack.dylib
+## 
+## locale:
+## [1] en_NZ.UTF-8/en_NZ.UTF-8/en_NZ.UTF-8/C/en_NZ.UTF-8/en_NZ.UTF-8
+## 
+## attached base packages:
+## [1] stats     graphics  grDevices utils     datasets  methods   base     
+## 
+## other attached packages:
+## [1] lubridate_1.7.4   kableExtra_1.1.0  ggplot2_3.3.0     skimr_2.1         drake_7.11.0     
+## [6] data.table_1.12.8 here_0.1          gridCarbon_0.1.0 
+## 
+## loaded via a namespace (and not attached):
+##  [1] Rcpp_1.0.4        txtq_0.2.0        lattice_0.20-40   prettyunits_1.1.1 zoo_1.8-7        
+##  [6] assertthat_0.2.1  rprojroot_1.3-2   digest_0.6.25     packrat_0.5.0     utf8_1.1.4       
+## [11] R6_2.4.1          repr_1.1.0        backports_1.1.5   evaluate_0.14     httr_1.4.1       
+## [16] pillar_1.4.3      rlang_0.4.5       progress_1.2.2    rstudioapi_0.11   rmarkdown_2.1    
+## [21] labeling_0.3      webshot_0.5.2     readr_1.3.1       stringr_1.4.0     igraph_1.2.5     
+## [26] munsell_0.5.0     compiler_3.6.3    xfun_0.12         pkgconfig_2.0.3   base64enc_0.1-3  
+## [31] htmltools_0.4.0   tidyselect_1.0.0  tibble_2.1.3      bookdown_0.18     fansi_0.4.1      
+## [36] viridisLite_0.3.0 crayon_1.3.4      dplyr_0.8.5       withr_2.1.2       grid_3.6.3       
+## [41] jsonlite_1.6.1    gtable_0.3.0      lifecycle_0.2.0   magrittr_1.5      storr_1.2.1      
+## [46] scales_1.1.0      cli_2.0.2         stringi_1.4.6     farver_2.0.3      xml2_1.2.5       
+## [51] filelock_1.0.2    vctrs_0.2.4       tools_3.6.3       forcats_0.5.0     glue_1.3.2       
+## [56] purrr_0.3.3       hms_0.5.3         parallel_3.6.3    yaml_2.2.1        colorspace_1.4-1 
+## [61] base64url_1.4     rvest_0.3.5       knitr_1.28</code></pre>
+</div>
+</div>
+<div id="references" class="section level1 unnumbered">
+<h1>References</h1>
+<div id="refs" class="references">
+<div id="ref-rmarkdown">
+<p>Allaire, JJ, Yihui Xie, Jonathan McPherson, Javier Luraschi, Kevin Ushey, Aron Atkins, Hadley Wickham, Joe Cheng, and Winston Chang. 2018. <em>Rmarkdown: Dynamic Documents for R</em>. <a href="https://CRAN.R-project.org/package=rmarkdown">https://CRAN.R-project.org/package=rmarkdown</a>.</p>
+</div>
+<div id="ref-data.table">
+<p>Dowle, M, A Srinivasan, T Short, S Lianoglou with contributions from R Saporta, and E Antonyan. 2015. <em>Data.table: Extension of Data.frame</em>. <a href="https://CRAN.R-project.org/package=data.table">https://CRAN.R-project.org/package=data.table</a>.</p>
+</div>
+<div id="ref-lubridate">
+<p>Grolemund, Garrett, and Hadley Wickham. 2011. “Dates and Times Made Easy with lubridate.” <em>Journal of Statistical Software</em> 40 (3): 1–25. <a href="http://www.jstatsoft.org/v40/i03/">http://www.jstatsoft.org/v40/i03/</a>.</p>
+</div>
+<div id="ref-baseR">
+<p>R Core Team. 2016. <em>R: A Language and Environment for Statistical Computing</em>. Vienna, Austria: R Foundation for Statistical Computing. <a href="https://www.R-project.org/">https://www.R-project.org/</a>.</p>
+</div>
+<div id="ref-ggplot2">
+<p>Wickham, Hadley. 2009. <em>Ggplot2: Elegant Graphics for Data Analysis</em>. Springer-Verlag New York. <a href="http://ggplot2.org">http://ggplot2.org</a>.</p>
+</div>
+<div id="ref-bookdown">
+<p>Xie, Yihui. 2016a. <em>Bookdown: Authoring Books and Technical Documents with R Markdown</em>. Boca Raton, Florida: Chapman; Hall/CRC. <a href="https://github.com/rstudio/bookdown">https://github.com/rstudio/bookdown</a>.</p>
+</div>
+<div id="ref-knitr">
+<p>———. 2016b. <em>Knitr: A General-Purpose Package for Dynamic Report Generation in R</em>. <a href="https://CRAN.R-project.org/package=knitr">https://CRAN.R-project.org/package=knitr</a>.</p>
+</div>
+<div id="ref-kableExtra">
+<p>Zhu, Hao. 2018. <em>KableExtra: Construct Complex Table with ’Kable’ and Pipe Syntax</em>. <a href="https://CRAN.R-project.org/package=kableExtra">https://CRAN.R-project.org/package=kableExtra</a>.</p>
+</div>
+</div>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("hide" === "show");
+});
+</script>
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
