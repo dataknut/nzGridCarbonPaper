@@ -68,12 +68,11 @@ setPeakPeriod <- function(dt){
 
 makeReport <- function(f){
   # default = html
-  rmarkdown::render(input = rmdFile,
+  rmarkdown::render(input = paste0(repoParams$repoLoc, "/Rmd/" , rmdFile,".rmd"),
                     params = list(title = title,
                                   subtitle = subtitle,
                                   authors = authors),
-                    output_file = paste0(repoParams$repoLoc,"/docs/", title,"_",
-                                         subtitle,".html")
+                    output_file = paste0(repoParams$repoLoc,"/docs/", f,".html")
   )
 }
 
@@ -189,7 +188,7 @@ authors <- "Ben Anderson, Carsten Dortans and Marilette Lotte"
 
 
 # >> run report ----
-rmdFile <- paste0(repoParams$repoLoc, "/Rmd/covidLockdown_NZ.Rmd")
+rmdFile <- "covidLockdown_NZ"
 
 #
 makeReport(rmdFile)
